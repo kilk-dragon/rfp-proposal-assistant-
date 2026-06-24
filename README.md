@@ -1,16 +1,55 @@
-# React + Vite
+# RFP Proposal Response Assistant
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A streaming AI assistant that drafts structured, professional answers to
+procurement and RFP questions — built for government and enterprise pre-sales
+workflows.
 
-Currently, two official plugins are available:
+Type a procurement question (e.g. *"Describe your approach to data residency
+and sovereignty for UAE government cloud workloads"*) and the app streams back
+a structured draft response in real time.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## What it does
 
-## React Compiler
+- Streams responses token-by-token from the Anthropic API (Claude)
+- Uses a tuned system prompt focused on government/enterprise procurement language
+- Handles API and network errors gracefully with clear, user-facing messages
+- Clean, demo-ready interface with live status indication
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Tech
 
-## Expanding the ESLint configuration
+- **React** (Vite) front-end
+- **Anthropic Messages API** with streaming via the Fetch streaming API
+- Plain CSS, no UI framework
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Running locally
+
+```bash
+npm install
+```
+
+Create a `.env` file in the project root:
+
+VITE_ANTHROPIC_API_KEY=your_anthropic_api_key
+
+Then start the dev server:
+
+```bash
+npm run dev
+```
+
+Open the local URL shown in the terminal (usually http://localhost:5173).
+
+## A note on architecture
+
+This demo calls the Anthropic API **directly from the browser** for simplicity,
+using the `anthropic-dangerous-direct-browser-access` header. This exposes the
+API key to the client and is suitable only for local development.
+
+A production version would proxy all API calls through a backend service so the
+key is never sent to the browser. This is a deliberate, documented trade-off for
+a local demo — not an oversight.
+
+## Status
+
+Project 1 of a hands-on AI engineering build series. Next: a
+retrieval-augmented generation (RAG) app over a custom document set.
