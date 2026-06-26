@@ -14,54 +14,19 @@ function App() {
     setAnswer("");
     setError("");
     try {
-      const res = await fetch("https://api.anthropic.com/v1/messages", {
+      const res = await fetch("/api/chat", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-api-key": import.meta.env.VITE_ANTHROPIC_API_KEY,
-          "anthropic-version": "2023-06-01",
-          "anthropic-dangerous-direct-browser-access": "true",
-        },
-        body: JSON.stringify({
-          model: "claude-sonnet-4-6",
-          max_tokens: 3000,
-          stream: true,
-          system:
-            "You are a pre-sales proposal assistant. Given a procurement/RFP question, draft a clear, structured, professional answer suitable for a government or enterprise client.",
-          messages: [{ role: "user", content: question }],
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ question }),
       });
 
+      const data = await res.json();
+
       if (!res.ok) {
-        const errData = await res.json();
-        throw new Error(errData.error?.message || `Request failed (${res.status})`);
+        throw new Error(data.error || `Request failed (${res.status})`);
       }
 
-      const reader = res.body.getReader();
-      const decoder = new TextDecoder();
-
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        const chunk = decoder.decode(value);
-        const lines = chunk.split("\n");
-        for (const line of lines) {
-          if (line.startsWith("data: ")) {
-            const dataStr = line.slice(6);
-            try {
-              const event = JSON.parse(dataStr);
-              if (
-                event.type === "content_block_delta" &&
-                event.delta?.type === "text_delta"
-              ) {
-                setAnswer((prev) => prev + event.delta.text);
-              }
-            } catch {
-              // ignore non-JSON lines
-            }
-          }
-        }
-      }
+      setAnswer(data.answer);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -125,8 +90,8 @@ function App() {
       </main>
 
       <footer className="footnote">
-        Demo calls the Anthropic API directly from the browser. A production build
-        would proxy requests through a backend so the API key is never exposed.
+        Requests are proxied through a serverless backend so the API key is never
+        exposed to the browser.
       </footer>
     </div>
   );
